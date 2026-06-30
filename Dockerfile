@@ -1,11 +1,27 @@
 # Prepare the base environment.
-FROM ghcr.io/dbca-wa/docker-apps-dev:ubuntu_2510_base_python_node  as builder_base_parkstay
+FROM ubuntu:26.04 AS builder_base_gis_kaartdijin_boodja
+# FROM ghcr.io/dbca-wa/docker-apps-dev:ubuntu_2604_base_python AS builder_base_gis_kaartdijin_boodja
 
 MAINTAINER asi@dbca.wa.gov.au
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Australia/Perth
 ENV PRODUCTION_EMAIL=True
 ENV SECRET_KEY="ThisisNotRealKey"
+
+############################
+# 1. Install base packages found in the official base image
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl wget git libmagic-dev gcc g++ make binutils \
+    libproj-dev gdal-bin python3 python3-setuptools python3-dev python3-pip \
+    tzdata rsyslog gunicorn virtualenv libpq-dev patch \
+    postgresql-client mtr htop vim sudo build-essential \
+    && apt-get clean
+
+# 2. Setup environment structures (Mimicking base image)
+# Essential for SSL and Python command compatibility
+RUN update-ca-certificates && \
+    ln -s /usr/bin/python3 /usr/bin/python
+############################
 
 RUN apt-get clean
 RUN apt-get update
@@ -18,6 +34,7 @@ RUN apt-get install --no-install-recommends -y run-one
 # RUN apt-get install --no-install-recommends -y postgresql-client
 # RUN apt-get install --no-install-recommends -y nodejs npm
 # RUN apt-get install --no-install-recommends -y python3-pil
+RUN apt-get install --no-install-recommends -y python3-venv
 
 RUN groupadd -g 5000 oim 
 RUN useradd -g 5000 -u 5000 oim -s /bin/bash -d /app
