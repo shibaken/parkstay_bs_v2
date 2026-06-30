@@ -1,6 +1,7 @@
 # Prepare the base environment.
 FROM ubuntu:26.04 AS builder_base_parkstay
-# FROM ghcr.io/dbca-wa/docker-apps-dev:ubuntu_2604_base_python AS builder_base_gis_kaartdijin_boodja
+################# Use the following base image for actual builds.
+# FROM ghcr.io/dbca-wa/docker-apps-dev:ubuntu_2604_base_python_node AS builder_base_parkstay
 
 MAINTAINER asi@dbca.wa.gov.au
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,9 +10,10 @@ ENV PRODUCTION_EMAIL=True
 ENV SECRET_KEY="ThisisNotRealKey"
 
 ############################
+ENV NODE_MAJOR=24
 # 1. Install base packages found in the official base image
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl wget git libmagic-dev gcc g++ make binutils \
+    curl wget git libmagic-dev gcc g++ make binutils gnupg \
     libproj-dev gdal-bin python3 python3-setuptools python3-dev python3-pip \
     tzdata rsyslog gunicorn virtualenv libpq-dev patch \
     postgresql-client mtr htop vim sudo build-essential \
@@ -21,6 +23,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Essential for SSL and Python command compatibility
 RUN update-ca-certificates && \
     ln -s /usr/bin/python3 /usr/bin/python
+
+# 3. Install Node.js from NodeSource (Logic ported from base image)
+RUN mkdir -p /etc/apt/keyrings && \
+    curl -fsSL https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key | gpg --dearmor -o /etc/apt/keyrings/nodesource.gpg && \
+    echo "deb [signed-by=/etc/apt/keyrings/nodesource.gpg] https://deb.nodesource.com/node_$NODE_MAJOR.x nodistro main" \
+    | tee /etc/apt/sources.list.d/nodesource.list && \
+    apt-get update && \
+    apt-get install -y nodejs
 ############################
 
 RUN apt-get clean
