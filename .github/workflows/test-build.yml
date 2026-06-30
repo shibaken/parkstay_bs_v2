@@ -1,0 +1,20 @@
+name: Docker Build Test
+
+on:
+  push:
+    branches: [ "working-for-ubuntu2604-local-test" ] # Run whenever you push to your working branch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build only (No Push)
+        # This step will just test if the Dockerfile is valid and can build Ubuntu 26.04
+        run: |
+          docker build . --file Dockerfile -t test-image:latest
