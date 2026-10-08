@@ -2762,7 +2762,7 @@ def booking_updates(request, *args, **kwargs):
                                         booking.override_reason = dr[0]
                                         booking.override_reason_info = price_override_admin['override_reason_details']
                                         booking.save()
-                                        parkstay_models.AdditionalBooking.objects.filter(identifier='priceoverride').delete()
+                                        parkstay_models.AdditionalBooking.objects.filter(booking=booking, identifier='priceoverride').delete()
                                         ab_or = parkstay_models.AdditionalBooking.objects.create(booking=booking,
                                                              fee_description=booking.override_reason.text+" - "+booking.override_reason_info,
                                                              amount='0.00',

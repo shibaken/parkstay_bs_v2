@@ -260,7 +260,7 @@ class MakeBookingsView(TemplateView):
         context['create_booking_on_behalf'] = False
         cp = 0
         if booking:
-            if booking.campground and request.user.email:
+            if booking.campground and request.user.is_authenticated and request.user.email:
                 cp = parkstay_models.CampgroundPermission.objects.filter(email=request.user.email,campground=booking.campground,active=True,permission_group=0).count()
         if cp > 0:
             context['create_booking_on_behalf'] = True
@@ -647,7 +647,7 @@ class ChangeBookingView(TemplateView):
             booking = booking_data[0]
             cp = 0
             if booking:
-                if booking.campground and request.user.email:
+                if booking.campground and request.user.is_authenticated and request.user.email:
                     cp = parkstay_models.CampgroundPermission.objects.filter(email=request.user.email,campground=booking.campground,active=True,permission_group=0).count()
 
             if (booking.customer.id == request.user.id and booking.customer_managed_booking_disabled is False) or (request.user.is_staff is True or cp > 0):
