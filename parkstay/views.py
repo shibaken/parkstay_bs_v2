@@ -52,6 +52,7 @@ from django.db.models import Max
 from django.core.cache import cache
 
 from parkstay.helpers import is_officer
+from parkstay.sanitisation import check_plain_text
 from parkstay import utils
 from parkstay import booking_availability
 from parkstay import context_processors
@@ -260,7 +261,7 @@ class MakeBookingsView(TemplateView):
         context['create_booking_on_behalf'] = False
         cp = 0
         if booking:
-            if booking.campground and request.user.email:
+            if booking.campground and request.user.is_authenticated and request.user.email:
                 cp = parkstay_models.CampgroundPermission.objects.filter(email=request.user.email,campground=booking.campground,active=True,permission_group=0).count()
         if cp > 0:
             context['create_booking_on_behalf'] = True
@@ -472,6 +473,14 @@ class MakeBookingsView(TemplateView):
         if vehicle_errors is True:
             return self.render_page(request, booking, form, vehicles, show_errors=True)
 
+        try:
+            for name in ('toc', 'outsideregion', 'trav_res', 'no_payment',
+                         'custom_acknowledgment', 'custom_acknowledgment_text'):
+                check_plain_text(request.POST.get(name, ''))
+        except ValidationError as e:
+            form.add_error(None, e)
+            return self.render_page(request, booking, form, vehicles, show_errors=True)
+
         # update the booking object with information from the form
         if not booking.details:
             booking.details = {}
@@ -647,7 +656,7 @@ class ChangeBookingView(TemplateView):
             booking = booking_data[0]
             cp = 0
             if booking:
-                if booking.campground and request.user.email:
+                if booking.campground and request.user.is_authenticated and request.user.email:
                     cp = parkstay_models.CampgroundPermission.objects.filter(email=request.user.email,campground=booking.campground,active=True,permission_group=0).count()
 
             if (booking.customer.id == request.user.id and booking.customer_managed_booking_disabled is False) or (request.user.is_staff is True or cp > 0):

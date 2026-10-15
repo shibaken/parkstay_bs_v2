@@ -63,6 +63,8 @@ if not DEBUG:
 else:
     REST_FRAMEWORK['DEFAULT_RENDERER_CLASSES']=('rest_framework.renderers.JSONRenderer','rest_framework_csv.renderers.CSVRenderer')
 
+# show the DRF API root view (list of API endpoints) at /api/
+SHOW_API_ROOT = decouple.config('SHOW_API_ROOT', default=False, cast=bool)
 
 TEMPLATES[0]['DIRS'].append(os.path.join(BASE_DIR, 'parkstay', 'templates'))
 TEMPLATES[0]['DIRS'].append(os.path.join(BASE_DIR, 'django_site_queue', 'templates'))
@@ -252,6 +254,7 @@ print (CSRF_TRUSTED_ORIGINS_STRING)
 CSRF_TRUSTED_ORIGINS = json.loads(str(CSRF_TRUSTED_ORIGINS_STRING))
 # CSRF_COOKIE_DOMAIN = decouple.config("CSRF_COOKIE_DOMAIN", default='.dbca.wa.gov.au')
 CSRF_COOKIE_SECURE = decouple.config('CSRF_COOKIE_SECURE',default=True, cast=bool) 
+SESSION_COOKIE_SECURE = decouple.config('SESSION_COOKIE_SECURE', default=True, cast=bool)
 # This is needed so that the chmod is not called in django/core/files/storage.py
 # (_save method of FileSystemStorage class)
 # As it causes a permission exception when using azure network drives

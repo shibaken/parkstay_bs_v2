@@ -12,6 +12,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Australia/Perth
 ENV PRODUCTION_EMAIL=True
 ENV SECRET_KEY="ThisisNotRealKey"
+ENV VIRTUAL_ENV=/app/venv
 
 RUN apt-get clean
 RUN apt-get update
@@ -44,8 +45,8 @@ RUN rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
 FROM builder_base_parkstay as python_libs_parkstay
 WORKDIR /app
 USER oim
-RUN virtualenv /app/venv
-ENV PATH=/app/venv/bin:$PATH
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH=$VIRTUAL_ENV/bin:$PATH
 RUN git config --global --add safe.directory /app
 COPY requirements.txt ./
 RUN pip install --upgrade pip

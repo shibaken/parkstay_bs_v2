@@ -1,6 +1,7 @@
 from django import forms
 #from ledger.address.models import Country
 from ledger_api_client.country_models import Country
+from parkstay.sanitisation import check_plain_text
 
 class LoginForm(forms.Form):
     email = forms.EmailField(max_length=254)
@@ -47,6 +48,18 @@ class MakeBookingsForm(forms.Form):
         if ('num_adult' in self.cleaned_data and 'num_concession' in self.cleaned_data):
             if (self.cleaned_data.get('num_adult') + self.cleaned_data.get('num_concession')) < 1:
                 raise forms.ValidationError('Booking requires at least 1 guest that is an adult or concession.')
+
+    def clean_first_name(self):
+        return check_plain_text(self.cleaned_data['first_name'])
+
+    def clean_last_name(self):
+        return check_plain_text(self.cleaned_data['last_name'])
+
+    def clean_phone(self):
+        return check_plain_text(self.cleaned_data['phone'])
+
+    def clean_postcode(self):
+        return check_plain_text(self.cleaned_data['postcode'])
 
 
 class AnonymousMakeBookingsForm(MakeBookingsForm):

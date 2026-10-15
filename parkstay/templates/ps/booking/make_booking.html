@@ -301,7 +301,7 @@
                                                  Vehicle Rego 
                                   </div>
                                   <div class="d-flex justify-content-center" >
-                                        <div v-if="vehicle[1].length > 0" v-html="vehicle[1]">
+                                        <div v-if="vehicle[1].length > 0" v-text="vehicle[1]">
                                         </div>
                                         <div v-else>
                                                 <b style='color:red'><span v-if="vehicle[4] == true">To be confirmed</span><span v-else>UPDATE REQUIRED</span></b>
@@ -356,7 +356,7 @@
 
                                           </div>
                                           <div class="col-md-4" >
-						<div v-if="vehicle[1].length > 0" v-html="vehicle[1]">
+						<div v-if="vehicle[1].length > 0" v-text="vehicle[1]">
 						</div>
                                                 <div v-else>
 							<b style='color:red'><span v-if="vehicle[4] == true">To be confirmed</span><span v-else>UPDATE REQUIRED</span></b>
@@ -997,7 +997,7 @@
                 } else {
                     expires = "";
                 }
-                document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/";
+                document.cookie = encodeURIComponent(name) + "=" + encodeURIComponent(value) + expires + "; path=/; secure";
             },
             updateLocalStorage: function() {
                 var vm = this;
